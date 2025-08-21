@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Prezentare Sistem - Warehouse AI</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+    #bg-canvas {
+      position: fixed;
+      z-index: -1;
+      top: 0;
+      left: 0;
+    }
+    nav {
+      width: 100%;
+      padding: 15px 40px;
+      background-color: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav h1 {
+      font-size: 1.6rem;
+      color: #4CAF50;
+    }
+    .nav-buttons a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      background: #4CAF50;
+      padding: 8px 16px;
+      border-radius: 4px;
+      transition: 0.3s;
+    }
+    .nav-buttons a:hover {
+      background: #43a047;
+    }
+    .hero {
+      text-align: center;
+      padding: 100px 20px 40px;
+      background: rgba(0,0,0,0.5);
+    }
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .section {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 20px;
+      background-color: rgba(30,30,30,0.8);
+      border-radius: 10px;
+    }
+    .section h3 {
+      color: #4CAF50;
+      margin-bottom: 10px;
+    }
+    .section p {
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <nav>
+    <h1>Warehouse Hub</h1>
+    <div class="nav-buttons">
+      <a href="index.php">Home</a>
+      <a href="php/logout.php">Logout</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h2>Simulare Roboți Autonomi în Depozit</h2>
+    <p>Un sistem inteligent de livrare a coletelor într-un mediu de tip depozit, cu algoritmi de evitare a coliziunilor și colaborare între roboți.</p>
+  </div>
+
+  <div class="section">
+    <h3>🔁 Algoritmul de Hivemind</h3>
+    <p>Fiecare robot este conștient de poziția și starea celorlalți roboți, păstrând o memorie colectivă sincronizată în timp real. Nu există un server central sau un lider, ci fiecare robot își construiește propriile decizii în funcție de ce "vede" în sistem. Dacă un robot identifică un potențial blocaj sau conflict pe traseu, va replanifica imediat ruta sa în mod autonom, asigurând astfel o fluiditate a livrărilor fără coliziuni.</p>
+
+    <h3>⭐ Algoritmul A* Pathfinding</h3>
+    <p>Planificarea traseelor se realizează cu algoritmul A* (A star), cunoscut pentru eficiența și acuratețea sa. Acesta calculează drumul cel mai scurt până la țintă, luând în considerare:
+
+        Costul deja parcurs (g)
+        Distanța estimată până la destinație (h, adesea cu formula Manhattan)
+        Scorul final f = g + h pentru prioritizare
+        Fiecare nod analizat este evaluat și comparat, iar cele deja vizitate sunt excluse pentru a evita ciclurile sau buclele infinite.</p>
+
+    <h3>⏳ Sincronizare și evitare</h3>
+    <p></p>Roboții sunt animați fluid cu ajutorul interpolării liniare (lerp), pentru o mișcare naturală. În fiecare cadru de simulare, un robot verifică dacă următoarea poziție este ocupată sau nu. Dacă da, acesta se oprește sau regenerează drumul. Astfel, roboții nu doar că evită coliziunile, ci și învață în timp cum să își sincronizeze traiectoriile pentru o eficiență maximă. </p>
+  </div>
+
+  <script>
+    let dots = [];
+
+    class Dot {
+      constructor() {
+        this.x = random(window.innerWidth);
+        this.y = random(window.innerHeight);
+        this.size = 4;
+        this.speed = 1.5;
+        this.dir = random([0, 90, 180, 270]); // sus, dreapta, jos, stânga
+      }
+
+      update() {
+        let angle = radians(this.dir);
+        this.x += cos(angle) * this.speed;
+        this.y += sin(angle) * this.speed;
+
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+          this.dir = (this.dir + 180) % 360;
+        }
+
+        for (let other of dots) {
+          if (other !== this && dist(this.x, this.y, other.x, other.y) < 10) {
+            this.dir = (this.dir + random([90, 180, 270])) % 360;
+          }
+        }
+      }
+
+      draw() {
+        noStroke();
+        fill(76, 175, 80, 150);
+        circle(this.x, this.y, this.size);
+      }
+    }
+
+    function setup() {
+      let c = createCanvas(window.innerWidth, window.innerHeight);
+      c.id("bg-canvas");
+      for (let i = 0; i < 60; i++) {
+        dots.push(new Dot());
+      }
+    }
+
+    function draw() {
+      background(18, 20, 23, 50);
+      for (let d of dots) {
+        d.update();
+        d.draw();
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(window.innerWidth, window.innerHeight);
+    }
+  </script>
+</body>
+</html>
